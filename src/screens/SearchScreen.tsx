@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { usePlayer, Song } from '../store/playerStore';
+import { searchCuratedTracksLocally } from '../data/curatedTracks';
 import AddToPlaylistModal from '../components/AddToPlaylistModal';
 import { 
   ArtistResult, 
@@ -230,36 +231,50 @@ export default function SearchScreen() {
       setIsFromCache(false);
     }
 
-    // Debounce network request to backend predictive search
+    // Debounce network request to backend predictive search with client-side fallback
     const timer = setTimeout(async () => {
+      let fetchedSongs: Song[] = [];
+      let fetchedArtists: ArtistResult[] = [];
+      let fetchedAlbums: AlbumResult[] = [];
+      let fetchedTopResult: TopResultItem | null = null;
+
       try {
         const res = await axios.get(`/api/search?q=${encodeURIComponent(trimmed)}`);
         const data = res.data;
 
-        const fetchedSongs: Song[] = data.songs || data.results || [];
-        const fetchedArtists: ArtistResult[] = data.artists || [];
-        const fetchedAlbums: AlbumResult[] = data.albums || [];
-        const fetchedTopResult: TopResultItem | null = data.topResult || null;
-
-        setSongs(fetchedSongs);
-        setArtists(fetchedArtists);
-        setAlbums(fetchedAlbums);
-        setTopResult(fetchedTopResult);
-        setIsFromCache(false);
-
-        // Cache the categorized predictive result
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify({
-            songs: fetchedSongs,
-            artists: fetchedArtists,
-            albums: fetchedAlbums,
-            topResult: fetchedTopResult,
-          }));
-        } catch (e) {
-          // Ignore cache write errors
-        }
+        fetchedSongs = data.songs || data.results || [];
+        fetchedArtists = data.artists || [];
+        fetchedAlbums = data.albums || [];
+        fetchedTopResult = data.topResult || null;
       } catch (error) {
-        console.error('Predictive search error:', error);
+        console.warn('Predictive search API unavailable, using client-side engine:', error);
+      }
+
+      // If backend search returned empty or failed (e.g. static deployed build on Vercel), fallback to local curated engine
+      if (fetchedSongs.length === 0) {
+        const local = searchCuratedTracksLocally(trimmed);
+        fetchedSongs = local.songs;
+        fetchedArtists = local.artists;
+        fetchedAlbums = local.albums;
+        fetchedTopResult = local.topResult;
+      }
+
+      setSongs(fetchedSongs);
+      setArtists(fetchedArtists);
+      setAlbums(fetchedAlbums);
+      setTopResult(fetchedTopResult);
+      setIsFromCache(false);
+
+      // Cache the categorized predictive result
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({
+          songs: fetchedSongs,
+          artists: fetchedArtists,
+          albums: fetchedAlbums,
+          topResult: fetchedTopResult,
+        }));
+      } catch (e) {
+        // Ignore cache write errors
       } finally {
         setLoading(false);
       }

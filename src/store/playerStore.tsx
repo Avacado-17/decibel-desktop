@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
+import { DEFAULT_INITIAL_TRACK } from '../data/curatedTracks';
 
 export interface Song {
   id: string; // YouTube Video ID
@@ -73,7 +74,7 @@ const PLAYLISTS_STORAGE_KEY = 'decibel_user_playlists';
 const DEFAULT_PLAYLISTS: Playlist[] = [];
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [currentSong, setCurrentSong] = useState<Song | null>(DEFAULT_INITIAL_TRACK);
   const [queue, setQueue] = useState<Song[]>([]);
   const [history, setHistory] = useState<Song[]>([]);
   const [likedSongs, setLikedSongs] = useState<Song[]>(() => {

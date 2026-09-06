@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { usePlayer, Song } from '../store/playerStore';
+import { CURATED_TRACKS } from '../data/curatedTracks';
 import { useUser } from '../store/userStore';
 
 interface GenreItem {
@@ -24,88 +25,7 @@ interface DiscoverData {
   playlists: { id: string; name: string; trackCount: number; coverUrl: string }[];
 }
 
-const DEFAULT_CURATED_SONGS: Song[] = [
-  {
-    id: "MV_3Dpw-BRY",
-    title: "Nightcall",
-    artist: "Kavinsky",
-    album: "OutRun Dreams",
-    duration: 259,
-    coverUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=400",
-    genre: "Synthwave",
-    badge: "24-BIT"
-  },
-  {
-    id: "xZVSggLl9vo",
-    title: "Mein",
-    artist: "Asim Azhar",
-    album: "Mein OST",
-    duration: 250,
-    coverUrl: "https://i.ytimg.com/vi/xZVSggLl9vo/hq720.jpg",
-    genre: "Pop / OST",
-    badge: "DOLBY ATMOS"
-  },
-  {
-    id: "6CXKtmRjOto",
-    title: "Inaam",
-    artist: "Jasleen Royal ft. Badshah",
-    album: "Inaam - Single",
-    duration: 210,
-    coverUrl: "https://i.ytimg.com/vi/6CXKtmRjOto/hq720.jpg",
-    genre: "Indie Pop",
-    badge: "HI-RES"
-  },
-  {
-    id: "Z1iN-RJOI5Y",
-    title: "Thaam Lo",
-    artist: "Atif Aslam",
-    album: "Parwaaz Hai Junoon",
-    duration: 300,
-    coverUrl: "https://i.ytimg.com/vi/Z1iN-RJOI5Y/hq720.jpg",
-    genre: "Bollywood / Pop",
-    badge: "DOLBY ATMOS"
-  },
-  {
-    id: "tvcaYU7uofY",
-    title: "Hum",
-    artist: "Murtaza Qizilbash",
-    album: "Hum - Single",
-    duration: 220,
-    coverUrl: "https://i.ytimg.com/vi/tvcaYU7uofY/hq720.jpg",
-    genre: "Indie Pop",
-    badge: "MASTER"
-  },
-  {
-    id: "fJ9rUzIMcZQ",
-    title: "Bohemian Rhapsody",
-    artist: "Queen",
-    album: "A Night at the Opera",
-    duration: 354,
-    coverUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=400",
-    genre: "Rock",
-    badge: "HI-RES"
-  },
-  {
-    id: "FGBhQbmMxH8",
-    title: "One More Time",
-    artist: "Daft Punk",
-    album: "Discovery",
-    duration: 320,
-    coverUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=400",
-    genre: "Electronic",
-    badge: "MASTER"
-  },
-  {
-    id: "jfKfPfyJRdk",
-    title: "Deep Focus",
-    artist: "Ambient & Chill",
-    album: "Study Beats",
-    duration: 184,
-    coverUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=400",
-    genre: "Ambient",
-    badge: "MASTER"
-  }
-];
+const DEFAULT_CURATED_SONGS: Song[] = CURATED_TRACKS;
 
 const DEFAULT_GENRES: GenreItem[] = [
   {
