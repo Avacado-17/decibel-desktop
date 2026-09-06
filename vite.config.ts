@@ -4,10 +4,19 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
+const disableHostedPreviewHmr = {
+  name: 'disable-hosted-preview-hmr',
+  enforce: 'post' as const,
+  transformIndexHtml(html: string) {
+    return html.replace(/<script[^>]+src=["']\/@vite\/client["'][^>]*><\/script>/g, '');
+  },
+};
+
 export default defineConfig({
   plugins: [
     react(), 
     tailwindcss(),
+    disableHostedPreviewHmr,
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
