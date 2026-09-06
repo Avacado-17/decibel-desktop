@@ -46,9 +46,10 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}']
       },
+      // The hosted preview does not provide a Vite HMR WebSocket endpoint.
+      // Keep the service worker disabled in development so it cannot cache stale preview assets.
       devOptions: {
-        enabled: true,
-        type: 'module'
+        enabled: false
       }
     })
   ],

@@ -1,20 +1,41 @@
-import express from "express";
-import path from "path";
-import axios from "axios";
-import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
-// Lazy Gemini client helper
-let geminiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI | null {
+// server.ts
+var import_express = __toESM(require("express"), 1);
+var import_path = __toESM(require("path"), 1);
+var import_axios = __toESM(require("axios"), 1);
+var import_genai = require("@google/genai");
+var import_vite = require("vite");
+var geminiClient = null;
+function getGeminiClient() {
   if (!geminiClient && process.env.GEMINI_API_KEY) {
-    geminiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    geminiClient = new import_genai.GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   }
   return geminiClient;
 }
-
-// Curated Decibel Tracks matching the high-fidelity UI design
-const CURATED_TRACKS = [
+var CURATED_TRACKS = [
   {
     id: "MV_3Dpw-BRY",
     title: "Nightcall",
@@ -236,9 +257,7 @@ const CURATED_TRACKS = [
     badge: "24-BIT"
   }
 ];
-
-// Curated Artists Catalog for Predictive Search
-const ARTISTS_DATABASE = [
+var ARTISTS_DATABASE = [
   {
     id: "kavinsky",
     name: "Kavinsky",
@@ -380,9 +399,7 @@ const ARTISTS_DATABASE = [
     topTrackId: "5qap5aO4i9A"
   }
 ];
-
-// Curated Albums Catalog for Predictive Search
-const ALBUMS_DATABASE = [
+var ALBUMS_DATABASE = [
   {
     id: "outrun-dreams",
     title: "OutRun Dreams",
@@ -514,8 +531,7 @@ const ALBUMS_DATABASE = [
     badge: "MASTER"
   }
 ];
-
-const GENRES_LIST = [
+var GENRES_LIST = [
   {
     id: "electronic",
     name: "Electronic",
@@ -565,14 +581,10 @@ const GENRES_LIST = [
     query: "ambient deep space soundscape"
   }
 ];
-
 async function startServer() {
-  const app = express();
-  const PORT = 3000;
-
-  app.use(express.json());
-
-  // Status endpoint indicating API key connectivity
+  const app = (0, import_express.default)();
+  const PORT = 3e3;
+  app.use(import_express.default.json());
   app.get("/api/config", (req, res) => {
     res.json({
       youtubeConfigured: Boolean(process.env.YOUTUBE_API_KEY),
@@ -583,27 +595,23 @@ async function startServer() {
       audioHiResSupport: true
     });
   });
-
-  // Discover & Home Feed endpoint
   app.get("/api/discover", async (req, res) => {
     try {
       const apiKey = process.env.YOUTUBE_API_KEY;
-      let trendingItems: any[] = [];
-
+      let trendingItems = [];
       if (apiKey) {
         try {
-          const ytResp = await axios.get("https://www.googleapis.com/youtube/v3/videos", {
+          const ytResp = await import_axios.default.get("https://www.googleapis.com/youtube/v3/videos", {
             params: {
               part: "snippet",
               chart: "mostPopular",
               videoCategoryId: "10",
               maxResults: 10,
-              key: apiKey,
+              key: apiKey
             },
-            timeout: 5000,
+            timeout: 5e3
           });
-
-          trendingItems = ytResp.data.items.map((item: any) => ({
+          trendingItems = ytResp.data.items.map((item) => ({
             id: item.id,
             title: item.snippet.title,
             artist: item.snippet.channelTitle,
@@ -614,48 +622,42 @@ async function startServer() {
           console.warn("Could not fetch YouTube trending chart, using curated items.");
         }
       }
-
       res.json({
         recents: CURATED_TRACKS.slice(0, 6),
         suggested: trendingItems.length > 0 ? trendingItems.slice(0, 5) : CURATED_TRACKS.slice(0, 5),
         genres: GENRES_LIST,
-        companionInitialTrack: CURATED_TRACKS[6], // Neon Horizons
+        companionInitialTrack: CURATED_TRACKS[6],
+        // Neon Horizons
         playlists: []
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Discover API error:", err.message);
       res.status(500).json({ error: "Failed to load discover feed" });
     }
   });
-
-  // Genres endpoint
   app.get("/api/genres", (req, res) => {
     res.json({ genres: GENRES_LIST });
   });
-
-  // Genre tracks endpoint
   app.get("/api/genres/:genreId", async (req, res) => {
     try {
       const { genreId } = req.params;
       const genre = GENRES_LIST.find((g) => g.id.toLowerCase() === genreId.toLowerCase());
       const query = genre ? genre.query : `${genreId} music`;
-
       const apiKey = process.env.YOUTUBE_API_KEY;
       if (apiKey) {
         try {
-          const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
+          const response = await import_axios.default.get("https://www.googleapis.com/youtube/v3/search", {
             params: {
               part: "snippet",
               q: query,
               type: "video",
               videoCategoryId: "10",
               maxResults: 12,
-              key: apiKey,
+              key: apiKey
             },
-            timeout: 5000,
+            timeout: 5e3
           });
-
-          const items = response.data.items.map((item: any) => ({
+          const items = response.data.items.map((item) => ({
             id: item.id.videoId,
             title: item.snippet.title,
             artist: item.snippet.channelTitle,
@@ -663,44 +665,35 @@ async function startServer() {
             genre: genre?.name || genreId,
             badge: "24-BIT"
           }));
-
           res.json({ genre: genre || { id: genreId, name: genreId }, tracks: items });
           return;
         } catch (ytErr) {
           console.warn("YouTube genre search failed, falling back to curated list");
         }
       }
-
-      // Filter or return curated tracks matching or generic
       const matched = CURATED_TRACKS.filter(
         (t) => t.genre.toLowerCase() === genreId.toLowerCase()
       );
       res.json({
         genre: genre || { id: genreId, name: genreId },
-        tracks: matched.length > 0 ? matched : CURATED_TRACKS,
+        tracks: matched.length > 0 ? matched : CURATED_TRACKS
       });
-    } catch (error: any) {
+    } catch (error) {
       res.status(500).json({ error: "Failed to load genre tracks" });
     }
   });
-
-  // Helper to compute categorized search & topResult (Artists, Albums, Songs)
-  function categorizeSearch(queryString: string, songItems: any[]) {
-    // 1. Matched artists
-    const matchingArtists = ARTISTS_DATABASE.filter((a) =>
-      a.name.toLowerCase().includes(queryString) ||
-      a.genre.toLowerCase().includes(queryString)
+  function categorizeSearch(queryString, songItems) {
+    const matchingArtists = ARTISTS_DATABASE.filter(
+      (a) => a.name.toLowerCase().includes(queryString) || a.genre.toLowerCase().includes(queryString)
     );
-
-    // If songs provided, also dynamically aggregate artists
-    const dynamicArtistsMap = new Map();
+    const dynamicArtistsMap = /* @__PURE__ */ new Map();
     for (const s of songItems) {
       if (!s.artist) continue;
-      const cleanArtist = s.artist.replace(/ - Topic$/i, '').trim();
-      if (cleanArtist.toLowerCase().includes(queryString) && !matchingArtists.some(a => a.name.toLowerCase() === cleanArtist.toLowerCase())) {
+      const cleanArtist = s.artist.replace(/ - Topic$/i, "").trim();
+      if (cleanArtist.toLowerCase().includes(queryString) && !matchingArtists.some((a) => a.name.toLowerCase() === cleanArtist.toLowerCase())) {
         if (!dynamicArtistsMap.has(cleanArtist.toLowerCase())) {
           dynamicArtistsMap.set(cleanArtist.toLowerCase(), {
-            id: `artist-${cleanArtist.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+            id: `artist-${cleanArtist.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
             name: cleanArtist,
             imageUrl: s.coverUrl || "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=300",
             genre: s.genre || "Music",
@@ -713,21 +706,15 @@ async function startServer() {
       }
     }
     const allMatchingArtists = [...matchingArtists, ...Array.from(dynamicArtistsMap.values())];
-
-    // 2. Matched albums
-    const matchingAlbums = ALBUMS_DATABASE.filter((alb) =>
-      alb.title.toLowerCase().includes(queryString) ||
-      alb.artist.toLowerCase().includes(queryString) ||
-      alb.genre.toLowerCase().includes(queryString)
+    const matchingAlbums = ALBUMS_DATABASE.filter(
+      (alb) => alb.title.toLowerCase().includes(queryString) || alb.artist.toLowerCase().includes(queryString) || alb.genre.toLowerCase().includes(queryString)
     );
-
-    // Also extract albums from song items if song.album matches
-    const dynamicAlbumsMap = new Map();
+    const dynamicAlbumsMap = /* @__PURE__ */ new Map();
     for (const s of songItems) {
-      if (s.album && s.album.toLowerCase().includes(queryString) && !matchingAlbums.some(a => a.title.toLowerCase() === s.album.toLowerCase())) {
+      if (s.album && s.album.toLowerCase().includes(queryString) && !matchingAlbums.some((a) => a.title.toLowerCase() === s.album.toLowerCase())) {
         if (!dynamicAlbumsMap.has(s.album.toLowerCase())) {
           dynamicAlbumsMap.set(s.album.toLowerCase(), {
-            id: `album-${s.album.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+            id: `album-${s.album.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
             title: s.album,
             artist: s.artist,
             coverUrl: s.coverUrl,
@@ -740,25 +727,22 @@ async function startServer() {
       }
     }
     const allMatchingAlbums = [...matchingAlbums, ...Array.from(dynamicAlbumsMap.values())];
-
-    // 3. Top Result logic
-    let topResult: any = null;
-    const exactArtist = allMatchingArtists.find(a => a.name.toLowerCase() === queryString || a.name.toLowerCase().startsWith(queryString));
+    let topResult = null;
+    const exactArtist = allMatchingArtists.find((a) => a.name.toLowerCase() === queryString || a.name.toLowerCase().startsWith(queryString));
     if (exactArtist) {
-      topResult = { type: 'artist', data: exactArtist };
+      topResult = { type: "artist", data: exactArtist };
     } else {
-      const exactAlbum = allMatchingAlbums.find(a => a.title.toLowerCase() === queryString || a.title.toLowerCase().startsWith(queryString));
+      const exactAlbum = allMatchingAlbums.find((a) => a.title.toLowerCase() === queryString || a.title.toLowerCase().startsWith(queryString));
       if (exactAlbum) {
-        topResult = { type: 'album', data: exactAlbum };
+        topResult = { type: "album", data: exactAlbum };
       } else if (songItems.length > 0) {
-        topResult = { type: 'song', data: songItems[0] };
+        topResult = { type: "song", data: songItems[0] };
       } else if (allMatchingArtists.length > 0) {
-        topResult = { type: 'artist', data: allMatchingArtists[0] };
+        topResult = { type: "artist", data: allMatchingArtists[0] };
       } else if (allMatchingAlbums.length > 0) {
-        topResult = { type: 'album', data: allMatchingAlbums[0] };
+        topResult = { type: "album", data: allMatchingAlbums[0] };
       }
     }
-
     return {
       songs: songItems,
       artists: allMatchingArtists,
@@ -766,27 +750,17 @@ async function startServer() {
       topResult
     };
   }
-
-  // Helper: Live global search using Piped API + Invidious API + iTunes Catalog fallback
-  async function searchYouTubeScraper(queryStr: string) {
-    const items: any[] = [];
-    
-    // 1. Try Piped API (real YouTube search without API keys)
+  async function searchYouTubeScraper(queryStr) {
+    const items = [];
     try {
-      const pipedUrl = `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(queryStr + ' audio')} &filter=videos`;
-      const pipedResp = await axios.get(pipedUrl, { timeout: 4000 });
+      const pipedUrl = `https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(queryStr + " audio")} &filter=videos`;
+      const pipedResp = await import_axios.default.get(pipedUrl, { timeout: 4e3 });
       if (pipedResp.data && Array.isArray(pipedResp.data.items)) {
-        for (const item of pipedResp.data.items.filter((i: any) => i.type === 'stream').slice(0, 15)) {
-          const videoId = item.url ? item.url.replace('/watch?v=', '') : '';
+        for (const item of pipedResp.data.items.filter((i) => i.type === "stream").slice(0, 15)) {
+          const videoId = item.url ? item.url.replace("/watch?v=", "") : "";
           if (!videoId) continue;
-          
           const rawTitle = item.title || queryStr;
-          const cleanTitle = rawTitle
-            .replace(/[\(\[\{].*?(official|lyrics|lyrical|video|audio|hd|4k|ost|visualizer|hq).*?[\)\]\}]/gi, '')
-            .replace(/\|.*/, '')
-            .replace(/ - Topic$/i, '')
-            .trim();
-
+          const cleanTitle = rawTitle.replace(/[\(\[\{].*?(official|lyrics|lyrical|video|audio|hd|4k|ost|visualizer|hq).*?[\)\]\}]/gi, "").replace(/\|.*/, "").replace(/ - Topic$/i, "").trim();
           items.push({
             id: videoId,
             title: cleanTitle || rawTitle,
@@ -797,21 +771,17 @@ async function startServer() {
           });
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       console.warn("Piped API search warning:", e.message);
     }
-
     if (items.length > 0) return items;
-
-    // 2. Try Invidious API instance fallback
     try {
       const invidiousUrl = `https://vid.puffyan.us/api/v1/search?q=${encodeURIComponent(queryStr)}&type=video`;
-      const invResp = await axios.get(invidiousUrl, { timeout: 4000 });
+      const invResp = await import_axios.default.get(invidiousUrl, { timeout: 4e3 });
       if (invResp.data && Array.isArray(invResp.data)) {
         for (const v of invResp.data.slice(0, 15)) {
           const videoId = v.videoId;
           if (!videoId) continue;
-
           items.push({
             id: videoId,
             title: v.title || queryStr,
@@ -822,26 +792,20 @@ async function startServer() {
           });
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       console.warn("Invidious API search warning:", e.message);
     }
-
     if (items.length > 0) return items;
-
-    // 3. Try iTunes Search API for comprehensive global song metadata mapped to search query
     try {
       const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(queryStr)}&entity=song&limit=15`;
-      const itunesResp = await axios.get(itunesUrl, { timeout: 4000 });
+      const itunesResp = await import_axios.default.get(itunesUrl, { timeout: 4e3 });
       if (itunesResp.data && itunesResp.data.results) {
         for (const track of itunesResp.data.results) {
           const title = track.trackName || queryStr;
           const artist = track.artistName || "Artist";
           const album = track.collectionName || "Single";
-          const artwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '600x600bb') : undefined;
-          
-          // Use a deterministic video search ID or fallback hash
-          const videoId = "jfKfPfyJRdk"; // Lofi Girl / popular stable stream or fallback
-
+          const artwork = track.artworkUrl100 ? track.artworkUrl100.replace("100x100bb", "600x600bb") : void 0;
+          const videoId = "jfKfPfyJRdk";
           items.push({
             id: videoId,
             title,
@@ -852,15 +816,11 @@ async function startServer() {
           });
         }
       }
-    } catch (e: any) {
+    } catch (e) {
       console.warn("iTunes search API fallback warning:", e.message);
     }
-
     return items;
   }
-
-
-  // API Route to proxy YouTube Data API requests securely with predictive categorization
   app.get("/api/search", async (req, res) => {
     try {
       const { q } = req.query;
@@ -868,102 +828,85 @@ async function startServer() {
         res.status(400).json({ error: "Query parameter 'q' is required" });
         return;
       }
-
       const queryString = String(q).trim().toLowerCase();
       const apiKey = process.env.YOUTUBE_API_KEY;
-
-      // 1. Try Official YouTube API if Key is Available
       if (apiKey) {
         try {
-          const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
+          const response = await import_axios.default.get("https://www.googleapis.com/youtube/v3/search", {
             params: {
               part: "snippet",
               q: queryString,
               type: "video",
               maxResults: 20,
-              key: apiKey,
-            },
+              key: apiKey
+            }
           });
-
-          const items = (response.data.items || []).map((item: any) => ({
+          const items = (response.data.items || []).map((item) => ({
             id: item.id.videoId,
             title: item.snippet.title.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&"),
             artist: item.snippet.channelTitle,
             album: "Single",
             coverUrl: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
             badge: "DOLBY ATMOS"
-          })).filter((i: any) => i.id);
-
+          })).filter((i) => i.id);
           if (items.length > 0) {
-            const categorized = categorizeSearch(queryString, items);
-
-            res.json({ 
-              results: items, 
+            const categorized2 = categorizeSearch(queryString, items);
+            res.json({
+              results: items,
               songs: items,
-              artists: categorized.artists,
-              albums: categorized.albums,
-              topResult: categorized.topResult,
+              artists: categorized2.artists,
+              albums: categorized2.albums,
+              topResult: categorized2.topResult,
               source: "youtube",
               query: queryString
             });
             return;
           }
-        } catch (ytError: any) {
+        } catch (ytError) {
           console.warn("YouTube API search warning:", ytError.response?.data?.error?.message || ytError.message);
-          // Fall through to YouTube web scraper
         }
       }
-
-      // 2. Try Live YouTube Web Scraper
       const scrapedItems = await searchYouTubeScraper(queryString);
       if (scrapedItems.length > 0) {
-        const categorized = categorizeSearch(queryString, scrapedItems);
+        const categorized2 = categorizeSearch(queryString, scrapedItems);
         res.json({
           results: scrapedItems,
           songs: scrapedItems,
-          artists: categorized.artists,
-          albums: categorized.albums,
-          topResult: categorized.topResult,
+          artists: categorized2.artists,
+          albums: categorized2.albums,
+          topResult: categorized2.topResult,
           source: "youtube-live",
           query: queryString
         });
         return;
       }
-
-      // 3. Curated Decibel database fallback with tokenized query matching
       const queryTokens = queryString.split(/\s+/).filter(Boolean);
       const localMatches = CURATED_TRACKS.filter((t) => {
-        const fullText = `${t.title} ${t.artist} ${t.album || ''} ${t.genre} ${t.badge || ''}`.toLowerCase();
-        return queryTokens.some(token => fullText.includes(token));
+        const fullText = `${t.title} ${t.artist} ${t.album || ""} ${t.genre} ${t.badge || ""}`.toLowerCase();
+        return queryTokens.some((token) => fullText.includes(token));
       });
-
       const finalSongs = localMatches;
       const categorized = categorizeSearch(queryString, finalSongs);
-
-      res.json({ 
-        results: finalSongs, 
+      res.json({
+        results: finalSongs,
         songs: finalSongs,
         artists: categorized.artists,
         albums: categorized.albums,
         topResult: categorized.topResult,
-        source: "curated", 
+        source: "curated",
         query: queryString,
-        note: "High-fidelity Decibel database" 
+        note: "High-fidelity Decibel database"
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Search API Error:", error.message);
       res.status(500).json({ error: "Failed to perform search" });
     }
   });
-
-  // AI Gemini Smart Mix Generator Endpoint
   app.post("/api/ai/mix", async (req, res) => {
     try {
       const { prompt, currentTrack } = req.body;
       const ai = getGeminiClient();
-
       if (!ai) {
-        // Fallback curated mix based on prompt
         const selected = CURATED_TRACKS.slice(0, 4);
         res.json({
           title: `Decibel Mix: ${prompt || "Neon Night Drive"}`,
@@ -973,11 +916,10 @@ async function startServer() {
         });
         return;
       }
-
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: `You are an audio engineer and curator for Decibel, an onyx-and-neon high-fidelity music streaming app.
-        The user wants an audio mix for: "${prompt || currentTrack?.title || 'ambient electronic synthwave'}".
+        The user wants an audio mix for: "${prompt || currentTrack?.title || "ambient electronic synthwave"}".
         Suggest 4 song concepts with title, artist, genre (Electronic, Synthwave, Ambient, Jazz, Rock, or Classical), and a short 1-line vibe description.
         Output ONLY valid JSON in this structure:
         {
@@ -986,10 +928,9 @@ async function startServer() {
           "recommendations": [
             { "title": "Song Title", "artist": "Artist", "genre": "Electronic", "vibe": "Description" }
           ]
-        }`,
+        }`
       });
-
-      let parsed: any = null;
+      let parsed = null;
       try {
         const text = response.text || "";
         const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -999,9 +940,8 @@ async function startServer() {
       } catch (err) {
         console.warn("Failed to parse Gemini output as JSON");
       }
-
       const recommendations = parsed?.recommendations || [];
-      const tracks = recommendations.map((rec: any, idx: number) => ({
+      const tracks = recommendations.map((rec, idx) => ({
         id: CURATED_TRACKS[idx % CURATED_TRACKS.length].id,
         title: rec.title || "Decibel Horizon",
         artist: rec.artist || "Decibel Collective",
@@ -1009,14 +949,13 @@ async function startServer() {
         genre: rec.genre || "Electronic",
         badge: "MASTER"
       }));
-
       res.json({
         title: parsed?.title || "Decibel AI Mix",
         description: parsed?.description || "Dynamic AI-curated listening session.",
         tracks: tracks.length > 0 ? tracks : CURATED_TRACKS.slice(0, 4),
         source: "gemini"
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("AI Mix error:", err.message);
       res.json({
         title: "Decibel Ambient Mix",
@@ -1026,12 +965,9 @@ async function startServer() {
       });
     }
   });
-
-  // Helper to clean song titles and artist names for accurate lyrics matching
-  function cleanSongQuery(title: string, artist?: string) {
+  function cleanSongQuery(title, artist) {
     let t = title || "";
     let a = artist || "";
-
     if (t.includes(" - ")) {
       const parts = t.split(" - ");
       if (!a || /vevo|records|official|topic/i.test(a)) {
@@ -1039,92 +975,76 @@ async function startServer() {
       }
       t = parts.slice(1).join(" - ").trim();
     }
-
     t = t.replace(/\s*[\(\[].*?(official|remaster|video|audio|lyric|live|visualizer|hd|4k).*?[\)\]]/gi, "").trim();
     t = t.replace(/\s*(ft\.|feat\.|featuring)\s+[^\(\)\[\]]+/gi, "").trim();
-
     a = a.replace(/\s*-\s*Topic$/i, "");
     a = a.replace(/VEVO$/i, "");
     a = a.replace(/\s*[\(\[].*?[\)\]]/g, "").trim();
-
     return { cleanTitle: t, cleanArtist: a };
   }
-
-  // API Route to fetch synced or plain lyrics via LRCLIB
   app.get("/api/lyrics", async (req, res) => {
     try {
-      const rawTitle = (req.query.title as string) || "";
-      const rawArtist = (req.query.artist as string) || "";
-      const duration = req.query.duration ? Number(req.query.duration) : undefined;
-
+      const rawTitle = req.query.title || "";
+      const rawArtist = req.query.artist || "";
+      const duration = req.query.duration ? Number(req.query.duration) : void 0;
       if (!rawTitle) {
         res.status(400).json({ error: "Query parameter 'title' is required" });
         return;
       }
-
       const { cleanTitle, cleanArtist } = cleanSongQuery(rawTitle, rawArtist);
-
-      const client = axios.create({
+      const client = import_axios.default.create({
         baseURL: "https://lrclib.net/api",
         headers: { "User-Agent": "Decibel/2.0" },
-        timeout: 6000,
+        timeout: 6e3
       });
-
-      let lyricData: any = null;
-
-      // Strategy 1: Exact match with track_name and artist_name
+      let lyricData = null;
       if (cleanArtist) {
         try {
-          const getParams: any = { track_name: cleanTitle, artist_name: cleanArtist };
+          const getParams = { track_name: cleanTitle, artist_name: cleanArtist };
           if (duration) getParams.duration = Math.round(duration);
           const resp = await client.get("/get", { params: getParams });
           if (resp.data && (resp.data.syncedLyrics || resp.data.plainLyrics)) {
             lyricData = resp.data;
           }
         } catch {
-          // Fallback to query without duration
         }
-
         if (!lyricData && duration) {
           try {
             const resp = await client.get("/get", { params: { track_name: cleanTitle, artist_name: cleanArtist } });
             if (resp.data && (resp.data.syncedLyrics || resp.data.plainLyrics)) {
               lyricData = resp.data;
             }
-          } catch {}
+          } catch {
+          }
         }
       }
-
-      // Strategy 2: Search with cleaned title and artist
       if (!lyricData) {
         try {
           const queryTerm = `${cleanTitle} ${cleanArtist}`.trim();
           const searchResp = await client.get("/search", { params: { q: queryTerm } });
           const items = searchResp.data;
           if (Array.isArray(items) && items.length > 0) {
-            const withSynced = items.find((it: any) => it.syncedLyrics);
+            const withSynced = items.find((it) => it.syncedLyrics);
             lyricData = withSynced || items[0];
           }
-        } catch {}
+        } catch {
+        }
       }
-
-      // Strategy 3: Search with raw title as last resort
       if (!lyricData && rawTitle !== cleanTitle) {
         try {
           const searchResp = await client.get("/search", { params: { q: rawTitle } });
           const items = searchResp.data;
           if (Array.isArray(items) && items.length > 0) {
-            const withSynced = items.find((it: any) => it.syncedLyrics);
+            const withSynced = items.find((it) => it.syncedLyrics);
             lyricData = withSynced || items[0];
           }
-        } catch {}
+        } catch {
+        }
       }
-
-      if (!lyricData || (!lyricData.syncedLyrics && !lyricData.plainLyrics)) {
+      if (!lyricData || !lyricData.syncedLyrics && !lyricData.plainLyrics) {
         res.json({ found: false, synced: false, syncedLyrics: null, plainLyrics: null });
         return;
       }
-
       res.json({
         found: true,
         synced: Boolean(lyricData.syncedLyrics),
@@ -1133,37 +1053,33 @@ async function startServer() {
         trackName: lyricData.trackName || lyricData.name,
         artistName: lyricData.artistName,
         albumName: lyricData.albumName,
-        instrumental: Boolean(lyricData.instrumental),
+        instrumental: Boolean(lyricData.instrumental)
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Lyrics fetch error:", error.message);
       res.status(500).json({ error: "Failed to fetch lyrics" });
     }
   });
-
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
+    const vite = await (0, import_vite.createServer)({
       server: {
-    middlewareMode: true,
-    allowedHosts: true,
-    hmr: false,
-  },
-      appType: "spa",
+        middlewareMode: true,
+        allowedHosts: true,
+        hmr: false
+      },
+      appType: "spa"
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*all', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    const distPath = import_path.default.join(process.cwd(), "dist");
+    app.use(import_express.default.static(distPath));
+    app.get("*all", (req, res) => {
+      res.sendFile(import_path.default.join(distPath, "index.html"));
     });
   }
-
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Decibel Server running on port ${PORT}`);
   });
 }
-
 startServer();
-
+//# sourceMappingURL=server.cjs.map
