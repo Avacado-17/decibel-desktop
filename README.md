@@ -1,7 +1,7 @@
 # Decibel Web
 
-A modern web-based music player client built with React, Vite, and Tailwind CSS. 
-This project was migrated from a Kotlin Multiplatform Android application to a React Web app.
+A modern web-based music player client built with React, Vite, and Tailwind CSS.
+
 
 🖥️ **Desktop App**: Access the official desktop version at [decibel-desktop.vercel.app](https://decibel-desktop.vercel.app)
 

@@ -72,6 +72,7 @@ const TRACK_METADATA_CACHE_KEY = 'simp_track_metadata_cache';
 const PLAYLISTS_STORAGE_KEY = 'decibel_user_playlists';
 
 const DEFAULT_PLAYLISTS: Playlist[] = [];
+const DEFAULT_RECENTLY_PLAYED: Song[] = [];
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [currentSong, setCurrentSong] = useState<Song | null>(DEFAULT_INITIAL_TRACK);
