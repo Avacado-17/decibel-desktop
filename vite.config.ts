@@ -6,9 +6,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 const disableHostedPreviewHmr = {
   name: 'disable-hosted-preview-hmr',
-  enforce: 'post' as const,
-  transformIndexHtml(html: string) {
-    return html.replace(/<script[^>]+src=["']\/@vite\/client["'][^>]*><\/script>/g, '');
+  // Vite adds its dev client in a post HTML transform. Use the explicit
+  // post order so this cleanup runs after Vite's own injection.
+  transformIndexHtml: {
+    order: 'post' as const,
+    handler(html: string) {
+      return html.replace(/\s*<script\b[^>]*\bsrc=["']\/?@vite\/client["'][^>]*><\/script>/gi, '');
+    },
   },
 };
 

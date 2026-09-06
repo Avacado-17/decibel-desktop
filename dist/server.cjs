@@ -24,6 +24,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // server.ts
 var import_express = __toESM(require("express"), 1);
+var import_fs = __toESM(require("fs"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_axios = __toESM(require("axios"), 1);
 var import_genai = require("@google/genai");
@@ -1068,6 +1069,21 @@ async function startServer() {
         hmr: false
       },
       appType: "spa"
+    });
+    app.use(async (req, res, next) => {
+      if (req.method !== "GET" || !req.accepts("html")) {
+        next();
+        return;
+      }
+      try {
+        const template = import_fs.default.readFileSync(import_path.default.resolve(process.cwd(), "index.html"), "utf-8");
+        const html = await vite.transformIndexHtml(req.originalUrl, template);
+        const withoutHmrClient = html.replace(/\s*<script\b[^>]*\bsrc=["']\/?@vite\/client["'][^>]*><\/script>/gi, "");
+        res.status(200).set({ "Content-Type": "text/html" }).end(withoutHmrClient);
+      } catch (error) {
+        vite.ssrFixStacktrace(error);
+        next(error);
+      }
     });
     app.use(vite.middlewares);
   } else {
