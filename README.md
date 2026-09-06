@@ -1,4 +1,4 @@
-# Decibel (SimpMusic) Web
+# Decibel Web
 
 A modern web-based music player client built with React, Vite, and Tailwind CSS. 
 This project was migrated from a Kotlin Multiplatform Android application to a React Web app.
