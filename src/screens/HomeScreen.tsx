@@ -27,6 +27,14 @@ interface DiscoverData {
 
 const DEFAULT_CURATED_SONGS: Song[] = CURATED_TRACKS;
 
+const DEFAULT_RECENT_SONG: Song = {
+  id: 'nightcall-default',
+  title: 'Nightcall',
+  artist: 'Kavinsky',
+  coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=85&w=320',
+  audioUrl: '',
+};
+
 const DEFAULT_GENRES: GenreItem[] = [
   {
     id: "electronic",
@@ -93,7 +101,6 @@ export default function HomeScreen() {
   } = usePlayer();
 
   const [discoverData, setDiscoverData] = useState<DiscoverData | null>(null);
-  const [loading, setLoading] = useState(true);
 
   // Dynamic time-of-day greeting synced to the user's local time
   const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
@@ -142,12 +149,10 @@ export default function HomeScreen() {
       .then((res) => {
         if (mounted) {
           setDiscoverData(res.data);
-          setLoading(false);
         }
       })
       .catch((err) => {
         console.error('Failed to load discover data:', err);
-        if (mounted) setLoading(false);
       });
 
     return () => {
@@ -155,10 +160,11 @@ export default function HomeScreen() {
     };
   }, []);
 
-  // Use user recently played history
+  // Keep the home layout stable even when the API or local history is empty.
   const recentItems = useMemo(() => {
-    return recentlyPlayed.slice(0, 6);
-  }, [recentlyPlayed]);
+    const apiRecent = discoverData?.recents?.[0];
+    return [recentlyPlayed[0] || apiRecent || DEFAULT_RECENT_SONG];
+  }, [discoverData, recentlyPlayed]);
 
   const suggestedTracks = useMemo(() => {
     if (discoverData?.suggested && discoverData.suggested.length > 0) {
@@ -190,7 +196,7 @@ export default function HomeScreen() {
 
         {/* Recent Activity Grid */}
         {recentItems.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 max-w-[332px]">
             {recentItems.map((song, idx) => {
               const isCurrent = currentSong?.id === song.id;
               const isCurrentlyPlaying = isCurrent && isPlaying;

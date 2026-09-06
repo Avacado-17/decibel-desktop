@@ -1171,6 +1171,12 @@ async function startServer() {
         next(error);
       }
     });
+    // The hosted preview can retain an older HTML document that still requests
+    // Vite's client module. Return a harmless module so that stale documents
+    // cannot start a WebSocket connection through the preview proxy.
+    app.get('/@vite/client', (_req, res) => {
+      res.type('application/javascript').send('export {};');
+    });
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
