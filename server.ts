@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "fs";
 import path from "path";
 import axios from "axios";
 import { GoogleGenAI } from "@google/genai";
@@ -1150,6 +1151,25 @@ async function startServer() {
     hmr: false,
   },
       appType: "spa",
+    });
+
+    // In hosted previews, the platform cannot proxy Vite's HMR socket. Serve
+    // HTML through Vite for module transforms, then remove its dev client.
+    app.use(async (req, res, next) => {
+      if (req.method !== "GET" || !req.accepts("html")) {
+        next();
+        return;
+      }
+
+      try {
+        const template = fs.readFileSync(path.resolve(process.cwd(), "index.html"), "utf-8");
+        const html = await vite.transformIndexHtml(req.originalUrl, template);
+        const withoutHmrClient = html.replace(/\s*<script\b[^>]*\bsrc=["']\/?@vite\/client["'][^>]*><\/script>/gi, "");
+        res.status(200).set({ "Content-Type": "text/html" }).end(withoutHmrClient);
+      } catch (error) {
+        vite.ssrFixStacktrace(error as Error);
+        next(error);
+      }
     });
     app.use(vite.middlewares);
   } else {
