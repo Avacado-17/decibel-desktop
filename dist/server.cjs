@@ -1085,6 +1085,9 @@ async function startServer() {
         next(error);
       }
     });
+    app.get("/@vite/client", (_req, res) => {
+      res.type("application/javascript").send("export {};");
+    });
     app.use(vite.middlewares);
   } else {
     const distPath = import_path.default.join(process.cwd(), "dist");
