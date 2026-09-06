@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Search, User } from 'lucide-react';
 import { useUser } from '../store/userStore';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface TopAppBarProps {
   onOpenSettings: () => void;
@@ -32,7 +33,7 @@ export default function TopAppBar({
         </NavLink>
       </nav>
 
-      {/* Action Icons & User Profile */}
+      {/* Action Icons, PWA Install & User Profile */}
       <div className="flex items-center gap-3 text-neutral-400">
         <button
           onClick={() => navigate('/search')}
@@ -41,6 +42,8 @@ export default function TopAppBar({
         >
           <Search className="w-4 h-4" />
         </button>
+
+        <PWAInstallButton />
 
         {/* User Profile Button with Name */}
         <button 
@@ -59,3 +62,4 @@ export default function TopAppBar({
     </header>
   );
 }
+

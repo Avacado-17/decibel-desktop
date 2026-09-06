@@ -1,0 +1,15 @@
+{
+  "appId": "com.decibel.music",
+  "appName": "Decibel",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#0c0a09",
+      "showSpinner": false
+    }
+  }
+}

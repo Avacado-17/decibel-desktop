@@ -282,6 +282,79 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Sync browser and Android native MediaSession API (Lockscreen, Notification Drawer, Bluetooth Controls)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('mediaSession' in navigator)) return;
+
+    if (currentSong) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: currentSong.title,
+          artist: currentSong.artist,
+          album: currentSong.album || 'Decibel Soundstage',
+          artwork: [
+            { src: currentSong.coverUrl, sizes: '96x96', type: 'image/jpeg' },
+            { src: currentSong.coverUrl, sizes: '128x128', type: 'image/jpeg' },
+            { src: currentSong.coverUrl, sizes: '192x192', type: 'image/jpeg' },
+            { src: currentSong.coverUrl, sizes: '256x256', type: 'image/jpeg' },
+            { src: currentSong.coverUrl, sizes: '512x512', type: 'image/jpeg' },
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => {
+          if (playerRef.current?.playVideo) playerRef.current.playVideo();
+          setIsPlaying(true);
+        });
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+          if (playerRef.current?.pauseVideo) playerRef.current.pauseVideo();
+          setIsPlaying(false);
+        });
+
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          playPrevious();
+        });
+
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          playNext(true);
+        });
+
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (details.seekTime !== undefined) {
+            seekTo(details.seekTime);
+          }
+        });
+
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          seekTo(Math.max(0, progress - skipTime));
+        });
+
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          const skipTime = details.seekOffset || 10;
+          seekTo(Math.min(duration, progress + skipTime));
+        });
+      } catch (e) {
+        // Ignore MediaMetadata configuration errors if unsupported
+      }
+    }
+
+    try {
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+      if ('setPositionState' in navigator.mediaSession && duration > 0) {
+        navigator.mediaSession.setPositionState({
+          duration: Math.max(1, duration),
+          playbackRate: isPlaying ? 1.0 : 0.0,
+          position: Math.min(Math.max(0, progress), duration),
+        });
+      }
+    } catch (e) {
+      // Ignore
+    }
+  }, [currentSong, isPlaying, progress, duration]);
+
+
   const toggleRepeat = () => {
     setRepeatMode(prev => {
       if (prev === 'off') return 'all';

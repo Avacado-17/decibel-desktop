@@ -50,13 +50,42 @@ export function AudioVisualizer({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationFrameIdRef = useRef<number | null>(null);
 
-  // Configuration state
-  const [mode, setMode] = useState<VisualizerMode>('bars');
-  const [theme, setTheme] = useState<VisualizerColorTheme>('sunset');
-  const [sensitivity, setSensitivity] = useState<number>(1.2);
+  // Configuration state with persistence
+  const [mode, setMode] = useState<VisualizerMode>(() => {
+    try {
+      const saved = localStorage.getItem('decibel_visualizer_mode');
+      return (saved as VisualizerMode) || 'bars';
+    } catch { return 'bars'; }
+  });
+  const [theme, setTheme] = useState<VisualizerColorTheme>(() => {
+    try {
+      const saved = localStorage.getItem('decibel_visualizer_theme');
+      return (saved as VisualizerColorTheme) || 'sunset';
+    } catch { return 'sunset'; }
+  });
+  const [sensitivity, setSensitivity] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('decibel_visualizer_sensitivity');
+      return saved ? parseFloat(saved) : 1.2;
+    } catch { return 1.2; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('decibel_visualizer_mode', mode); } catch {}
+  }, [mode]);
+
+  useEffect(() => {
+    try { localStorage.setItem('decibel_visualizer_theme', theme); } catch {}
+  }, [theme]);
+
+  useEffect(() => {
+    try { localStorage.setItem('decibel_visualizer_sensitivity', sensitivity.toString()); } catch {}
+  }, [sensitivity]);
+
   const [isMicActive, setIsMicActive] = useState<boolean>(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [showControls, setShowControls] = useState<boolean>(false);
+
 
   // Web Audio API refs for real microphone/audio input
   const audioContextRef = useRef<AudioContext | null>(null);

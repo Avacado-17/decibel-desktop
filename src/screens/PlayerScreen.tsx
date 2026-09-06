@@ -48,32 +48,33 @@ export default function PlayerScreen() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-neutral-800 to-black p-8 relative overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-[#1a120c] via-[#0d0d11] to-[#0a0a0c] p-4 sm:p-6 md:p-8 relative overflow-hidden select-none">
       {/* Background glow */}
       <div 
-        className="absolute inset-0 opacity-30 blur-[100px] pointer-events-none"
+        className="absolute inset-0 opacity-25 blur-[120px] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 50% 0%, var(--color-primary), transparent 70%)`
+          backgroundImage: `radial-gradient(circle at 50% 10%, #ff6600, transparent 65%)`
         }}
       />
       
-      <div className="flex items-center justify-between mb-6 relative z-10 shrink-0">
+      {/* Top Header Controls */}
+      <div className="flex items-center justify-between mb-4 sm:mb-6 relative z-10 shrink-0 gap-2">
         <button 
           onClick={() => navigate(-1)}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-colors shrink-0"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/50 border border-white/10 text-white transition-all shrink-0 cursor-pointer"
           title="Back"
         >
           <ChevronDown className="w-6 h-6" />
         </button>
 
         {/* View Mode Switcher */}
-        <div className="flex items-center bg-black/40 backdrop-blur-md rounded-full p-1 border border-white/10 shadow-lg">
+        <div className="flex items-center bg-black/50 backdrop-blur-xl rounded-full p-1 border border-white/10 shadow-lg overflow-x-auto hide-scrollbar max-w-[280px] sm:max-w-none">
           <button
             id="player-tab-song"
             onClick={() => setViewMode('song')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
               viewMode === 'song'
-                ? 'bg-white/20 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8533] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -82,9 +83,9 @@ export default function PlayerScreen() {
           <button
             id="player-tab-visualizer"
             onClick={() => setViewMode('visualizer')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               viewMode === 'visualizer'
-                ? 'bg-primary text-black font-bold shadow-sm'
+                ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8533] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white'
             }`}
             title="Audio Visualizer"
@@ -95,9 +96,9 @@ export default function PlayerScreen() {
           <button
             id="player-tab-lyrics"
             onClick={() => setViewMode('lyrics')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               viewMode === 'lyrics'
-                ? 'bg-primary text-black font-bold shadow-sm'
+                ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8533] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -107,9 +108,9 @@ export default function PlayerScreen() {
           <button
             id="player-tab-queue"
             onClick={() => setViewMode('queue')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               viewMode === 'queue'
-                ? 'bg-white/20 text-white shadow-sm'
+                ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8533] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -122,20 +123,21 @@ export default function PlayerScreen() {
           <button 
             id="player-sleep-timer-btn"
             onClick={() => setShowSleepTimer(true)}
-            className={`h-10 px-3 flex items-center gap-1.5 rounded-full transition-all text-xs font-semibold ${
+            className={`h-10 px-3 flex items-center gap-1.5 rounded-full transition-all text-xs font-semibold cursor-pointer ${
               sleepTimerSeconds !== null 
-                ? 'bg-primary/20 text-primary border border-primary/30' 
-                : 'bg-black/20 hover:bg-black/40 text-neutral-300'
+                ? 'bg-[#ff6600]/20 text-[#ff6600] border border-[#ff6600]/40' 
+                : 'bg-black/30 hover:bg-black/50 border border-white/10 text-neutral-300'
             }`}
             title="Set Sleep Timer"
           >
-            <Timer className="w-4 h-4" />
+            <Timer className="w-4 h-4 text-[#ff6600]" />
             {sleepTimerSeconds !== null && (
               <span>{formatRemainingMinutes(sleepTimerSeconds)}</span>
             )}
           </button>
         </div>
       </div>
+
 
       <div className="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full relative z-10 min-h-0">
         {viewMode === 'queue' ? (
