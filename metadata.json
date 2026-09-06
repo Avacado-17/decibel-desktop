@@ -1,0 +1,7 @@
+{
+  "name": "Decibel",
+  "description": "Decibel - High-fidelity music streaming app featuring deep onyx neon soundwave aesthetics, intelligent AI mix curator, real-time synced lyrics, and studio-grade soundstage.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

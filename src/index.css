@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0c;
+  --color-surface: #0e0e11;
+  --color-surface-container-lowest: #070709;
+  --color-surface-container-low: #111114;
+  --color-surface-container: #16161a;
+  --color-surface-container-high: #1e1e23;
+  --color-surface-container-highest: #27272e;
+  --color-on-background: #f0ede8;
+  --color-on-surface: #f0ede8;
+  --color-on-surface-variant: #a69e96;
+  --color-primary: #ff6600;
+  --color-primary-container: #ff7a1a;
+  --color-primary-fixed: #ffcca3;
+  --color-on-primary: #000000;
+  --color-secondary: #ff9e59;
+  --color-secondary-container: #592700;
+  --color-tertiary: #ffb67a;
+  --color-outline: #4a3c31;
+  --color-outline-variant: #2b211a;
+  --color-surface-hover: #1e1e23;
+}
+
+body {
+  background-color: #0a0a0c;
+  color: #f0ede8;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 102, 0, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 102, 0, 0.5);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Onyx Glass Panel */
+.glass-panel {
+  background: rgba(18, 18, 22, 0.7);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 102, 0, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+}
+
+.card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255, 102, 0, 0.08);
+  border-color: rgba(255, 102, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 102, 0, 0.25);
+}
+
+.active-glow {
+  background: linear-gradient(90deg, rgba(255, 102, 0, 0.16) 0%, rgba(22, 22, 26, 0.8) 100%);
+  border-color: rgba(255, 102, 0, 0.45);
+  box-shadow: 0 0 16px rgba(255, 102, 0, 0.25);
+}
+
+.play-btn-glow {
+  box-shadow: 0 0 18px rgba(255, 102, 0, 0.7);
+}
+
+/* Ambient Deep Glow Animations */
+@keyframes ambient-glow {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+  50% { transform: scale(1.12) translate(30px, -15px); opacity: 0.5; }
+  100% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+}
+
+.ambient-orb-1 {
+  position: fixed;
+  top: -10%;
+  left: 20%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(255, 102, 0, 0.18) 0%, rgba(10, 10, 12, 0) 70%);
+  filter: blur(80px);
+  animation: ambient-glow 14s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-orb-2 {
+  position: fixed;
+  bottom: 5%;
+  right: 15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 60, 0, 0.14) 0%, rgba(10, 10, 12, 0) 70%);
+  filter: blur(90px);
+  animation: ambient-glow 18s ease-in-out infinite alternate-reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+.pulse-neon {
+  animation: pulse-dot 2s infinite ease-in-out;
+}

@@ -1,11 +1,30 @@
-<div align="center">
+# Decibel (SimpMusic) Web
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A modern web-based music player client built with React, Vite, and Tailwind CSS. 
+This project was migrated from a Kotlin Multiplatform Android application to a React Web app.
 
-  <h1>Built with AI Studio</h2>
+## Features
+- **Responsive Layout**: Sidebar navigation and sticky mini-player.
+- **Home Screen**: Personalized recommendations and recently played.
+- **Search Screen**: Category browsing and search input.
+- **Library Screen**: User's saved playlists, albums, and artists.
+- **Player View**: Fullscreen immersive player with playback controls.
+- **State Management**: Built-in React Context for managing music playback state.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Technologies
+- React 18
+- Vite
+- Tailwind CSS 4
+- Lucide React (Icons)
+- Framer Motion
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Development
+```bash
+npm install
+npm run dev
+```
 
-</div>
+## Build
+```bash
+npm run build
+```
