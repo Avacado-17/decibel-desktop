@@ -16,6 +16,16 @@ function getGeminiClient(): GoogleGenAI | null {
 // Curated Decibel Tracks matching the high-fidelity UI design
 const CURATED_TRACKS = [
   {
+    id: "MV_3Dpw-BRY",
+    title: "Nightcall",
+    artist: "Kavinsky",
+    album: "OutRun Dreams",
+    duration: 259,
+    coverUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=400",
+    genre: "Synthwave",
+    badge: "24-BIT"
+  },
+  {
     id: "xZVSggLl9vo",
     title: "Mein",
     artist: "Asim Azhar",
@@ -84,16 +94,6 @@ const CURATED_TRACKS = [
     coverUrl: "https://i.ytimg.com/vi/NVMa86cxU-k/hq720.jpg",
     genre: "Indie Pop",
     badge: "HI-RES"
-  },
-  {
-    id: "MV_3Dpw-BRY",
-    title: "Nightcall",
-    artist: "Kavinsky",
-    album: "OutRun Dreams",
-    duration: 259,
-    coverUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&q=80&w=400",
-    genre: "Synthwave",
-    badge: "24-BIT"
   },
   {
     id: "jfKfPfyJRdk",
@@ -196,7 +196,7 @@ const CURATED_TRACKS = [
     badge: "DOLBY ATMOS"
   },
   {
-    id: "Sunset-Midnight",
+    id: "rDBbaGCCIhk",
     title: "Sunset",
     artist: "The Midnight",
     album: "Endless Summer",
@@ -206,7 +206,7 @@ const CURATED_TRACKS = [
     badge: "DOLBY ATMOS"
   },
   {
-    id: "Time-Inception",
+    id: "RxabLA7UQ9U",
     title: "Time",
     artist: "Hans Zimmer",
     album: "Inception OST",
@@ -216,7 +216,7 @@ const CURATED_TRACKS = [
     badge: "DSD"
   },
   {
-    id: "SoWhat-Miles",
+    id: "ylXk1LBvIqU",
     title: "So What",
     artist: "Miles Davis",
     album: "Kind of Blue",
@@ -226,7 +226,7 @@ const CURATED_TRACKS = [
     badge: "HI-RES"
   },
   {
-    id: "A-Walk-Tycho",
+    id: "mehLx_Fjh_c",
     title: "A Walk",
     artist: "Tycho",
     album: "Dive",
@@ -893,13 +893,17 @@ async function startServer() {
         return;
       }
 
-      // 3. Curated Decibel database fallback with exact/partial query matching
-      const localMatches = CURATED_TRACKS.filter((t) =>
-        t.title.toLowerCase().includes(queryString) ||
-        t.artist.toLowerCase().includes(queryString) ||
-        (t.album && t.album.toLowerCase().includes(queryString)) ||
-        t.genre.toLowerCase().includes(queryString)
-      );
+      // 3. Curated Decibel database fallback with tokenized query matching
+      const queryTokens = queryString.split(/\s+/).filter(Boolean);
+      let localMatches = CURATED_TRACKS.filter((t) => {
+        const fullText = `${t.title} ${t.artist} ${t.album || ''} ${t.genre} ${t.badge || ''}`.toLowerCase();
+        return queryTokens.some(token => fullText.includes(token));
+      });
+
+      // Safeguard: If query token matching yields 0 results, fallback to CURATED_TRACKS
+      if (localMatches.length === 0) {
+        localMatches = CURATED_TRACKS;
+      }
 
       const finalSongs = localMatches;
       const categorized = categorizeSearch(queryString, finalSongs);
