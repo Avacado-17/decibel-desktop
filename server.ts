@@ -895,15 +895,10 @@ async function startServer() {
 
       // 3. Curated Decibel database fallback with tokenized query matching
       const queryTokens = queryString.split(/\s+/).filter(Boolean);
-      let localMatches = CURATED_TRACKS.filter((t) => {
+      const localMatches = CURATED_TRACKS.filter((t) => {
         const fullText = `${t.title} ${t.artist} ${t.album || ''} ${t.genre} ${t.badge || ''}`.toLowerCase();
         return queryTokens.some(token => fullText.includes(token));
       });
-
-      // Safeguard: If query token matching yields 0 results, fallback to CURATED_TRACKS
-      if (localMatches.length === 0) {
-        localMatches = CURATED_TRACKS;
-      }
 
       const finalSongs = localMatches;
       const categorized = categorizeSearch(queryString, finalSongs);

@@ -248,13 +248,8 @@ export function searchCuratedTracksLocally(query: string) {
 
   let matchedSongs = CURATED_TRACKS.filter((t) => {
     const fullText = `${t.title} ${t.artist} ${t.album || ''} ${t.genre || ''} ${t.badge || ''}`.toLowerCase();
-    return queryTokens.every(token => fullText.includes(token)) || queryTokens.some(token => fullText.includes(token));
+    return queryTokens.some(token => fullText.includes(token));
   });
-
-  // Fail-safe: if no exact token matches found, return all curated tracks
-  if (matchedSongs.length === 0) {
-    matchedSongs = CURATED_TRACKS;
-  }
 
   // Synthesize artists from matches
   const artistsMap = new Map<string, ArtistResult>();
