@@ -642,10 +642,7 @@ export default function SearchScreen() {
                   </div>
 
                   {/* Play Action Row */}
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <span className="text-xs text-neutral-400 flex items-center gap-1 group-hover:text-white transition-colors">
-                      Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px] mx-1">Enter</kbd> to play
-                    </span>
+                  <div className="flex items-center justify-end pt-3 border-t border-white/5">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

@@ -241,9 +241,6 @@ export default function HomeScreen() {
                       isCurrent ? 'text-[#ff7a1a]' : 'text-white'
                     }`}>
                       {song.title}
-                      {isCurrent && (
-                        <span className="w-2 h-2 rounded-full bg-[#ff6600] shadow-[0_0_6px_#ff6600] pulse-neon" />
-                      )}
                     </h3>
                     <p className="text-neutral-400 text-[13px] truncate">
                       {song.artist}

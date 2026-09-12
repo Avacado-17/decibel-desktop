@@ -620,7 +620,7 @@ async function startServer() {
         recents: CURATED_TRACKS.slice(0, 6),
         suggested: trendingItems.length > 0 ? trendingItems.slice(0, 5) : CURATED_TRACKS.slice(0, 5),
         genres: GENRES_LIST,
-        companionInitialTrack: CURATED_TRACKS[6], // Neon Horizons
+        companionInitialTrack: null,
         playlists: []
       });
     } catch (err: any) {

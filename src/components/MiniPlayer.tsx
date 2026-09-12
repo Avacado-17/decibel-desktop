@@ -145,9 +145,6 @@ export default function MiniPlayer() {
             <span className="text-white hover:text-[#ff7a1a] font-semibold text-[14px] leading-tight truncate">
               {currentSong.title}
             </span>
-            {isPlaying && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#ff6600] shadow-[0_0_6px_#ff6600] pulse-neon hidden sm:inline-block shrink-0" />
-            )}
           </div>
           <span className="text-neutral-400 hover:text-neutral-200 text-[12px] leading-tight truncate mt-0.5">
             {currentSong.artist}

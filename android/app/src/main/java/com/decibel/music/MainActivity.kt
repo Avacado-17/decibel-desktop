@@ -32,4 +32,16 @@ class MainActivity : BridgeActivity() {
             startService(serviceIntent)
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        // Prevent the Android system from pausing standard WebView audio/video/JS when backgrounded
+        bridge?.webView?.onResume()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Re-enforce active WebView execution when app goes entirely to background or screen turns off
+        bridge?.webView?.onResume()
+    }
 }

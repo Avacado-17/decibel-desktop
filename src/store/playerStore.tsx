@@ -33,6 +33,7 @@ interface PlayerContextType {
   sleepTimerSeconds: number | null; // Remaining seconds, or null if inactive
   playerRef: React.MutableRefObject<any>;
   playSong: (song: Song) => void;
+  loadSongQuietly: (song: Song) => void;
   playPlaylist: (songs: Song[], startIndex?: number) => void;
   togglePlay: () => void;
   pause: () => void;
@@ -534,6 +535,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setProgress(0);
   };
 
+  const loadSongQuietly = (song: Song) => {
+    setCurrentSong(song);
+    setIsPlaying(false);
+    setProgress(0);
+  };
+
   const togglePlay = () => {
     if (!playerRef.current) return;
     if (isPlaying) {
@@ -718,7 +725,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         isLiked, toggleLike, clearLikedSongs, playPlaylist,
         clearRecentlyPlayed, removeRecentlyPlayed, getCachedTrack,
         createPlaylist, deletePlaylist, renamePlaylist, addSongToPlaylist, removeSongFromPlaylist, isSongInPlaylist,
-        playSong, togglePlay, pause, seekTo, setVolumeLevel, 
+        playSong, loadSongQuietly, togglePlay, pause, seekTo, setVolumeLevel, 
         onPlayerReady, onPlayerStateChange,
         playNext, playPrevious, addToQueue, removeFromQueue
       }}

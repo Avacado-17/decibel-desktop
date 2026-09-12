@@ -29,7 +29,6 @@ export default function TopAppBar({
           }
         >
           Discover
-          <span className="w-1.5 h-1.5 rounded-full bg-[#ff6600] shadow-[0_0_8px_#ff6600]" />
         </NavLink>
       </nav>
 

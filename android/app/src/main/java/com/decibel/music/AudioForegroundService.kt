@@ -33,7 +33,7 @@ class AudioForegroundService : Service() {
         // Acquire WakeLock to keep CPU active for continuous background streaming when screen is off
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Decibel::AudioWakeLock").apply {
-            acquire(10 * 60 * 1000L) // 10 minutes default renewal
+            acquire() // Hold indefinitely until explicitly released on service destroy
         }
 
         // Initialize Android MediaSessionCompat for Lockscreen / Notification / Bluetooth controls

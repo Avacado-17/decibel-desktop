@@ -96,10 +96,6 @@ export default function UserProfileModal({
               <h4 className="text-base font-bold text-white truncate">
                 {inputName.trim() || 'Your Username'}
               </h4>
-              <p className="text-xs text-neutral-400 flex items-center gap-1.5 mt-0.5 font-mono">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-                Decibel Listener
-              </p>
             </div>
           </div>
 

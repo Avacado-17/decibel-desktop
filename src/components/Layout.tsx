@@ -1,35 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import axios from 'axios';
 import Sidebar from './Sidebar';
 import TopAppBar from './TopAppBar';
 import MiniPlayer from './MiniPlayer';
 import UserProfileModal from './UserProfileModal';
-import { usePlayer } from '../store/playerStore';
 
 export default function Layout() {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const { currentSong, playSong } = usePlayer();
-
-  // Load initial track if none active
-  useEffect(() => {
-    let isMounted = true;
-
-    // If no song loaded yet, initialize with default track
-    if (!currentSong) {
-      axios.get('/api/discover')
-        .then((res) => {
-          if (isMounted && res.data?.companionInitialTrack && !currentSong) {
-            playSong(res.data.companionInitialTrack);
-          }
-        })
-        .catch(() => {});
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0c] text-white select-none relative font-sans">
