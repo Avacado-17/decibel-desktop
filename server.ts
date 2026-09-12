@@ -1145,37 +1145,8 @@ async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: {
-    middlewareMode: true,
-    allowedHosts: true,
-    hmr: false,
-  },
+      server: { middlewareMode: true, allowedHosts: true },
       appType: "spa",
-    });
-
-    // In hosted previews, the platform cannot proxy Vite's HMR socket. Serve
-    // HTML through Vite for module transforms, then remove its dev client.
-    app.use(async (req, res, next) => {
-      if (req.method !== "GET" || !req.accepts("html")) {
-        next();
-        return;
-      }
-
-      try {
-        const template = fs.readFileSync(path.resolve(process.cwd(), "index.html"), "utf-8");
-        const html = await vite.transformIndexHtml(req.originalUrl, template);
-        const withoutHmrClient = html.replace(/\s*<script\b[^>]*\bsrc=["']\/?@vite\/client["'][^>]*><\/script>/gi, "");
-        res.status(200).set({ "Content-Type": "text/html" }).end(withoutHmrClient);
-      } catch (error) {
-        vite.ssrFixStacktrace(error as Error);
-        next(error);
-      }
-    });
-    // The hosted preview can retain an older HTML document that still requests
-    // Vite's client module. Return a harmless module so that stale documents
-    // cannot start a WebSocket connection through the preview proxy.
-    app.get('/@vite/client', (_req, res) => {
-      res.type('application/javascript').send('export {};');
     });
     app.use(vite.middlewares);
   } else {

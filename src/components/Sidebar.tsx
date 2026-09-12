@@ -32,8 +32,8 @@ export default function Sidebar({ onOpenSettings }: SidebarProps) {
           />
         </div>
         <div className="hidden md:block">
-          <h1 className="text-white font-black text-[22px] tracking-wider leading-none flex items-center gap-1 font-sans">
-            DECI<span className="text-[#ff6600] drop-shadow-[0_0_12px_rgba(255,102,0,0.8)]">BEL</span>
+          <h1 className="text-white font-semibold text-[22px] tracking-wider leading-none font-sans">
+            DECIBEL
           </h1>
         </div>
       </div>
